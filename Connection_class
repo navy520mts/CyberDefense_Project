@@ -1,0 +1,30 @@
+class Connection: # creating a class to take in variables to create a meaningful connection.
+
+	def __init__(self, src, dst, sTime, lTime, bData): # Constructor
+		self.src = src # source
+		self.dst = dst # destination
+		self.sTime = sTime # start time
+		self.lTime = lTime # end time
+		self.bData = bData # data size
+		
+	def getsrc(self):
+		return self.src
+		
+	def getdst(self):
+		return self.dst
+	
+	def getsTime(self):
+		return self.sTime
+		
+	def getlTime(self):
+		return self.lTime
+	
+	def setlTime(self, lTime):
+		self.getlTime = lTime
+		
+	def getbData(self):
+		return self.bData
+		
+	def incbytes(self, bData):
+		self.bData = bData + self.getbData()
+	
