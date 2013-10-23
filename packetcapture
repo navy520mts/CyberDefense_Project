@@ -2,6 +2,7 @@ import socket
 from struct import *
 import datetime
 import sys
+#import scapy.all
 from scapy.all import *
 
 f= open("/root/Desktop/packetFile.txt", "w") #opens file with name of " insert name"
