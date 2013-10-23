@@ -1,0 +1,30 @@
+import pygame
+import Team
+from pygame.locals import *
+
+def update(screen,teams,num_teams):
+	runner = True
+	
+	while runner:	#Loop that runs continuously until terminated by quit event(A.K.A. clicking exit on the program
+		screen.fill((255,255,255))	#Colors the screen white
+		color = (161,156,156)
+		for team in teams:	#Calls the draw function from each team
+			team.draw()
+		for event in pygame.event.get():	#Listener for when the red X is clicked ont he application to close it
+			if event.type == QUIT:
+				runner = False
+		pygame.display.update()	#Applies changes to the screen, and re-draws everything
+			
+pygame.init()
+
+screen = pygame.display.set_mode((900,900))	#Screen resolution
+pygame.display.set_caption('DEF-WATCH')	#Sets the window's title on the application
+screen.fill((255,255,255))	#Colors the screen white for initialization
+
+num_teams = 11 #Static number of teams, can be placed into a config in the future
+teams = []
+for i in range(num_teams):
+	teams.append(Team.Team(i,screen,num_teams)) #adds the teams to a global array
+
+
+update(screen,teams,num_teams)	#Calls the main loop that will update and run the program
