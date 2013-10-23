@@ -1,0 +1,147 @@
+import socket
+from struct import *
+import datetime
+import sys
+from scapy.all import *
+
+f= open("/root/Desktop/packetFile.txt", "w") #opens file with name of " insert name"
+
+
+def tcpConSort(destIP, sourceIP, destPort, flag2):
+	if flag2==16:
+		f.write("%s:%s:%s:%s" %(destIP, sourceIP, destPort, flag2))
+		f.write("\n")
+		
+
+#*******************************************************************************************************************************************************
+# tcp
+# 		notes on flags
+#			24= PA
+#			02= syn 
+#			18= syn ack
+#			16= ack 
+#*******************************************************************************************************************************************************
+
+def tcp(p,pp,protcol,ethDest,ethSource,packetCaptureTime):
+	print "**********************",  protcol , " ***********************"
+	print "The time of capture: %s" %packetCaptureTime
+	print "Ethernet Destination:" , ethDest 
+	print "Extracting IP Packet: " , ethSource 
+	destIP=p.dst
+	sourceIP=p.src
+	destPort=p.dport
+	sourcePort=p.sport 
+	flag=pp.flags # flag type 
+	ack=pp.ack # ack number 
+	lenth=p.len # packet length
+	print "Extracting TCP/UDP Packet"
+	print "IP Destination: ", destIP
+	print "IP Source: ", sourceIP
+	print "Extracting TCP/UDP Packet"
+	print "Destination Port: ", destPort
+	print "Source Port: ", sourcePort
+	print "flag: ", flag2
+	print "len: ", lenth
+	#pkts[0].payload.show()
+	#tcpConSort(destIP, sourceIP, destPort, flag2)
+
+#*******************************************************************************************************************************************************
+# udp
+#*******************************************************************************************************************************************************
+
+def udp(p,protcol,ethDest,ethSource,packetCaptureTime):
+	print "**********************",  protcol , " ***********************"
+	print "The time of capture: %s" %packetCaptureTime
+	print "Ethernet Destination:" , ethDest 
+	print "Extracting IP Packet: " , ethSource 
+	destIP=p.dst
+	sourceIP=p.src
+	destPort=p.dport
+	sourcePort=p.sport
+	lenth=p.len
+	print "Extracting TCP/UDP Packet"
+	print "IP Destination: ", destIP
+	print "IP Source: ", sourceIP
+	print "Extracting TCP/UDP Packet"
+	print "Destination Port: ", destPort
+	print "Source Port: ", sourcePort
+	print "len: ", lenth
+
+#*******************************************************************************************************************************************************
+# icmp
+#*******************************************************************************************************************************************************
+	
+def icmp(p,protcol,ethDest,ethSource,packetCaptureTime):
+	print "**********************",  protcol , " ***********************"
+	print "The time of capture: %s" %packetCaptureTime
+	print "Ethernet Destination:" , ethDest 
+	print "Extracting IP Packet: " , ethSource 
+	destIP=p.dst
+	sourceIP=p.src
+	destPort=p.dport
+	sourcePort=p.sport
+	flag=p.flags
+	lenth=p.len
+	print "Extracting TCP/UDP Packet"
+	print "IP Destination: ", destIP
+	print "IP Source: ", sourceIP
+	print "Extracting TCP/UDP Packet"
+	print "Destination Port: ", destPort
+	print "Source Port: ", sourcePort
+	print "len: ", lenth
+
+#*******************************************************************************************************************************************************
+# capture 
+#*******************************************************************************************************************************************************
+
+while(True):
+	
+	#iface= "eth0" #this sets the interface where the scan will take place 
+	#print sniff.__doc__  #shows the documentation for the sniff function
+	#hexdump(pkts) # prints out the hex of the packet 
+	#print type(pkts[0])# shows us the location of where the the type is located in this case its'scapy.layers.l2.Ether'
+	#hexdump(pkts[3])
+	#pkts[3].show() # shows up the print out info of the packet in the list at space 0 
+	#print type(pkts[0].payload)# is the location 'scapy.layers.inet.IP' 
+	#pkts[0].payload.payload.show() #peels to the next layer 
+
+	packetCaptureTime=datetime.datetime.now()# this grabs the time of the capture based on the host computer time  
+	pkts = sniff(count=1,store=True) #to see documentation do print sniff.__doc__  shows the documentation for the sniff function
+	pkt = pkts[0]
+	ethDest= pkt.dst
+	ethSource= pkt.src
+	typ=pkt.type
+	p = pkt.payload # goes to the next layer of the packet to see what is inside
+	pp=pkt.payload.payload
+	
+	if typ== 0x800 : # checks to see if it has an IP layer 
+		protcol=p.proto 
+		if protcol==6 :
+			protcol="TCP"
+			tcp(p,pp,protcol,ethDest,ethSource,packetCaptureTime)
+			#pkts[0].payload.payload.show()	
+		elif protcol == 1 : # this checks the protocol to see if it is ICMP 
+			protcol="ICMP"
+			icmp(p,protcol,ethDest,ethSource,packetCaptureTime)
+		elif protcol == 17 : # this checks the protocol to see if it is UDP
+			protcol="UDP"
+			udp(p,protcol,ethDest,ethSource,packetCaptureTime)
+			#pkts[0].payload.payload.show()				
+
+	elif typ== 0x806: # checks to see if it is arp
+			  # at this time we do not have anything to do with ARP at this time.
+		print "********************** ARP ***********************" # check this to see if it is strickly ARP *******
+		print "The time of capture: %s" %packetCaptureTime
+		p = pkt.payload
+		destIP=p.hwdst
+		sourceIP=p.pdst
+		hsource=p.hwsrc
+		print "hsource ", hsource
+		print "IP Destination: ", destIP
+		print "IP Source: ", sourceIP
+		
+		
+
+
+   
+
