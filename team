@@ -1,0 +1,123 @@
+import pygame
+import math
+from pygame.locals import *
+
+red = (255,0,0)
+green = (0,255,0)
+blue = (0,0,255)
+orange = (255,180,0)
+white = (255,255,255)
+yellow = (255,255,0)
+black = (0,0,0)
+pink = (255,200,200)
+gray = (161,156,156)
+majenta = (255,20,147)
+#Massive array of colors, needs to be set to generate random RGB based on number of teams in the future
+colors = [red,green,blue,orange,pink,yellow,gray,majenta,red,green,blue,orange,pink,yellow,gray,majenta,red,green,blue,orange,pink,yellow,gray,majenta,red,green,blue,orange,pink,yellow,gray,majenta]
+
+
+
+class Team:
+	def __init__(self, team, screen, num_teams):
+		self.screen = screen
+		self.team = team
+		self.members = ['Host1','Host2','Host3','Host4','Host5','Host6',"H7","H8"]
+		self.color = colors[team]
+		self.numteams = num_teams
+		self.Hostvec = 2.89	#Vector for hosts as they spin around their team, constant set as starting point, makes no difference unless they are not spinning, in which case this will determine the position of every team
+		self.Teamvec = 4.79	#Same as Hostvec except for teams
+		self.radius = 350	#Radius for all teams, needs to be converted from constant to something algorithmic based on team
+		self.trafficRadius = self.radius - 150	#Radius for traffic barrier from center, should be slightly less 
+		self.trafficOffset = .2	#offset for inbound and outbound traffic connectors, needs to be algorithmic with original radius
+		self.hostRadius = self.radius/5	#radius of hosts, needs to be algorithmic based on hosts
+	
+	#Writes text to a location
+	def writeText(self,x,y,text):
+		font = pygame.font.Font(None, 20)
+		entry = font.render(text, 1, (0,0,0))
+		self.screen.blit(entry, (x-15,y))	#Moved over slightly so the text is centered
+	
+	#Draws a host, resembling a circle with the host's name inside of it
+	def drawHost(self,x,y,text):
+		pygame.draw.circle(self.screen, self.color, (x,y), 15, 0)
+		self.writeText(x,y,text)
+	
+	#Draws the line that connects inbound and outbound traffic circles
+	def drawConnWall(self,x,y,offsetX,offsetY):
+		pygame.draw.line(self.screen,self.color,(x,y),(offsetX,offsetY),5)
+
+	#Draws inboud connection circle
+	def drawInbound(self,x,y):
+		pygame.draw.circle(self.screen, self.color, (x,y), 15, 0)
+		font = pygame.font.Font(None, 20)
+		entry = font.render("Rx", 1, (0,0,0))
+		self.screen.blit(entry, (x-15,y-10))	#Moved over slightly so the text is centered
+	
+	#Draws outbound connection circle
+	def drawOutbound(self,x,y):
+		pygame.draw.circle(self.screen, self.color, (x,y), 15, 0)
+		font = pygame.font.Font(None, 20)
+		entry = font.render("Tx", 1, (0,0,0))
+		self.screen.blit(entry, (x-15,y-10))	#Moved over slightly so the text is centered
+	
+	#Returns the x coordinate of the team
+	def getTeamX(self):
+		c = self.getScreenCenterX()
+		return (int) (c+(self.radius*math.cos(self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+
+	#Returns the y coordinate of the team	`
+	def getTeamY(self):
+		c = self.getScreenCenterY()
+		return (int) (c+(self.radius*math.sin(self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+
+	#Returns the x coordinate of the inbound connection circle
+	def getInboundX(self):
+		c = self.getScreenCenterX()
+		return (int) (c+(self.trafficRadius*math.cos(-self.trafficOffset+self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+		
+	#Returns the y coordinate of the inbound connection circle
+	def getInboundY(self):
+		c = self.getScreenCenterY()
+		return (int) (c+(self.trafficRadius*math.sin(-self.trafficOffset+self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+	
+	#Returns the x coordinate of the outbound connection circle	
+	def getOutboundX(self):
+		c = self.getScreenCenterX()
+		return (int) (c+(self.trafficRadius*math.cos(self.trafficOffset+self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+		
+	#Returns the y coordinate of the outbound connection circle
+	def getOutboundY(self):
+		c = self.getScreenCenterY()
+		return (int) (c+(self.trafficRadius*math.sin(self.trafficOffset+self.Teamvec+((self.team-1)*((2*math.pi)/self.numteams)))))
+	
+	#Returns the x coordinate of the host
+	def getHostX(self, hostnum, numhosts):
+		return (int)(self.getTeamX()+(self.hostRadius*math.cos(self.Hostvec+((hostnum-1)*((2*math.pi)/numhosts)))))
+	
+	#Returns the y coordinate of the host
+	def getHostY(self, hostnum, numhosts):
+		return (int)(self.getTeamY()+(self.hostRadius*math.sin(self.Hostvec+((hostnum-1)*((2*math.pi)/numhosts)))))
+	
+	#Returns the x coordinate of the center of the screen
+	def getScreenCenterX(self):
+		x, y = self.screen.get_size()
+		return x/2
+	
+	#Returns the y coordinate of the center of the screen
+	def getScreenCenterY(self):
+		x, y = self.screen.get_size()
+		return y/2
+	
+	#Draws all of the hosts around the team, writes the team's name, and draws the traffic barrier
+	def draw(self):
+		#self.Hostvec +=.004	#The higher the increment the faster it will spin, remove to prevent spinning
+		#self.Teamvec +=.008	#Same thing as Hostvec
+		for i in range(0,len(self.members)):
+			numhosts=len(self.members)
+			x = self.getHostX(i,numhosts)
+			y = self.getHostY(i,numhosts)
+			self.drawHost(x,y,self.members[i])
+		self.writeText(self.getTeamX(),self.getTeamY(),"Team "+str(self.team+1))
+		self.drawConnWall(self.getInboundX(),self.getInboundY(),self.getOutboundX(),self.getOutboundY())
+		self.drawInbound(self.getInboundX(),self.getInboundY())
+		self.drawOutbound(self.getOutboundX(),self.getOutboundY())
