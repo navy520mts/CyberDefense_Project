@@ -1,0 +1,20 @@
+import socket
+from struct import *
+import datetime
+import sys
+#import scapy.all
+from scapy.all import *
+while (True):
+	#iface="eth0" #this sets the interface where the scan will take place 
+	pkts = sniff(count=1,store=1)# keep open always 
+	pkts.show()
+	#print sniff.__doc__ #shows the documentation for the sniff function 
+	#hexdump(pkts)
+	#print type(pkts[0])# shows us the location of where the the type is located in this case its'scapy.layers.l2.Ether'
+	#hexdump(pkts[3])
+	pkts[0].show() # shows the print out info of the packet in the list at space 0 
+	#print type(pkts[0].payload.payload)# is the location 'scapy.layers.inet.IP' 
+	#pkts[0].payload.show()
+	#pkts[0].payload.payload.show() #peels to the next layer 
+	#print scapy.__doc__
+	print "**********************" 
