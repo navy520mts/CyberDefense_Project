@@ -14,7 +14,8 @@ GUI: Has two file team and Host_GUI.
       -Host_GUI calls the class team and actually displays the teams on the screen and will be used to
        show the connections we are drawing from host to host.
        
-      -Read comments in each file to fully understand what each does, the comments Jesse made are pretty indepth and helpful.
+      -Read comments in each file to fully understand what each does, the comments Jesse made are pretty indepth
+       and helpful.
        
 Connection_Class: Is our base class for creating what will be a meaningful connection.
 
